@@ -16,8 +16,8 @@ const Characters = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    window.scrollTo({ top: 450, left: 0, behavior: "smooth" });
-    // window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    // window.scrollTo({ top: 450, left: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     const fetchData = async () => {
       try {
         const response = await axios.get(
@@ -56,11 +56,11 @@ const Characters = () => {
     <div className="loader">Loading ...</div>
   ) : (
     <>
-      <img
+      {/* <img
         className="hero-image"
         src="https://getwallpapers.com/wallpaper/full/6/b/3/771367-marvel-super-heroes-wallpaper-1920x1080-desktop.jpg"
         alt="marvel image hero"
-      />
+      /> */}
       <main>
         <section className="top-bar">
           <div className="page-selection-top-side">
