@@ -1,8 +1,13 @@
 import "../App.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+
+const addEllipsis = (text, maxLength) => {
+  return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
+};
 
 const Characters = () => {
   const [data, setData] = useState();
@@ -11,6 +16,7 @@ const Characters = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     const fetchData = async () => {
       try {
         const response = await axios.get(
@@ -31,13 +37,13 @@ const Characters = () => {
       : []
   );
 
-  const handleFavoriteCharacters = (character_id) => {
+  const handleFavoriteCharacters = (characterId) => {
     let favoriteCharacters2 = [...favoriteCharacters];
-    const index = favoriteCharacters2.indexOf(character_id);
+    const index = favoriteCharacters2.indexOf(characterId);
     if (index > -1) {
       favoriteCharacters2.splice(index, 1);
     } else {
-      favoriteCharacters2.push(character_id);
+      favoriteCharacters2.push(characterId);
     }
     setFavoriteCharacters(favoriteCharacters2);
     Cookies.set("favoriteCharacters", favoriteCharacters2.join("+"), {
@@ -49,89 +55,156 @@ const Characters = () => {
     <div className="loader">Loading ...</div>
   ) : (
     <main>
-      <div className="search-container">
-        <input
-          placeholder="Search character(s)"
-          type="text"
-          value={search}
-          onChange={(event) => {
-            setSearch(event.target.value);
-          }}
-        />
-      </div>
-      <section className="character-cards-list">
+      <section className="top-bar">
+        <div className="page-selection-top-side">
+          <div className="page-selection-button-container">
+            {currentPage > 2 && (
+              <button
+                className="page-selection-button first-page-button"
+                onClick={() => {
+                  setCurrentPage(1);
+                }}
+              >
+                &lt;&lt;&nbsp;&nbsp; FIRST PAGE
+              </button>
+            )}
+          </div>
+          <div className="page-selection-button-container">
+            {currentPage > 1 && (
+              <button
+                className="page-selection-button previous-page-button"
+                onClick={() => {
+                  setCurrentPage(currentPage - 1);
+                }}
+              >
+                &lt;&nbsp;&nbsp; PREVIOUS PAGE
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="search-container">
+          <input
+            placeholder="Search character(s)"
+            className="search-input"
+            type="text"
+            value={search}
+            onChange={(event) => {
+              setSearch(event.target.value);
+            }}
+          />
+          <FontAwesomeIcon icon="search" className="search-input-icon" />
+        </div>
+        <div className="page-selection-top-side">
+          <div className="page-selection-button-container">
+            {currentPage < Math.ceil(data.count / 100) && (
+              <button
+                className="page-selection-button next-page-button"
+                onClick={() => {
+                  setCurrentPage(currentPage + 1);
+                }}
+              >
+                NEXT PAGE &nbsp;&nbsp;&gt;
+              </button>
+            )}
+          </div>
+          <div className="page-selection-button-container">
+            {currentPage < Math.ceil(data.count / 100) - 1 && (
+              <button
+                className="page-selection-button last-page-button"
+                onClick={() => {
+                  setCurrentPage(Math.ceil(data.count / 100));
+                }}
+              >
+                LAST PAGE &nbsp;&nbsp;&gt;&gt;
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section className="cards-list">
         {data.results.map((character) => {
           return (
-            <div key={character._id} className="character-card">
+            <div key={character._id} className="card">
               <Link to={`/character/${character._id}/`}>
-                <div className="character-card-picture-details">
+                <div className="card-picture-details">
+                  <p className="name">{addEllipsis(character.name, 20)}</p>
                   <img
-                    src={`${character.thumbnail.path}/portrait_incredible.${character.thumbnail.extension}`}
+                    src={`${character.thumbnail.path}.${character.thumbnail.extension}`}
                     alt="character image"
                   />
-                  <div className="character-card-details">
-                    <p className="character-name">{character.name}</p>
-                    <p className="character-description">
-                      {character.description}
-                    </p>
-                  </div>
+                  <p className="description">
+                    {addEllipsis(character.description, 90)}
+                  </p>
                 </div>
               </Link>
-              <button
-                className="character-favorite"
-                onClick={() => handleFavoriteCharacters(character._id)}
-              >
-                Favorite ?
-              </button>
-              {favoriteCharacters.includes(character._id) && (
-                <span>Favorite</span>
-              )}
+              <div className="favorite">
+                {!favoriteCharacters.includes(character._id) ? (
+                  <button
+                    className="add-favorite"
+                    onClick={() => handleFavoriteCharacters(character._id)}
+                  >
+                    Add to Favorites
+                  </button>
+                ) : (
+                  <button
+                    className="remove-favorite"
+                    onClick={() => handleFavoriteCharacters(character._id)}
+                  >
+                    Remove from Favorites
+                  </button>
+                )}
+              </div>
             </div>
           );
         })}
       </section>
-      <section className="page-selection">
-        <div className="first-page">
-          {currentPage !== 1 && (
+      <section className="page-selection page-selection-bottom">
+        <div className="page-selection-button-container">
+          {currentPage > 2 && (
             <button
+              className="page-selection-button first-page-button"
               onClick={() => {
                 setCurrentPage(1);
               }}
             >
-              First
+              &lt;&lt;&nbsp;&nbsp; FIRST PAGE
             </button>
           )}
         </div>
-        <div className="previous-page">
-          {currentPage > 2 && (
+        <div className="page-selection-button-container">
+          {currentPage > 1 && (
             <button
+              className="page-selection-button previous-page-button"
               onClick={() => {
                 setCurrentPage(currentPage - 1);
               }}
             >
-              Previous
+              &lt;&nbsp;&nbsp; PREVIOUS PAGE
             </button>
           )}
         </div>
-        <div className="next-page">
-          {currentPage < Math.ceil(data.count / 100) - 1 && (
+        <div className="page-selection-button-container">
+          {currentPage < Math.ceil(data.count / 100) && (
             <button
+              className="page-selection-button next-page-button"
               onClick={() => {
                 setCurrentPage(currentPage + 1);
               }}
             >
-              Next
+              NEXT PAGE &nbsp;&nbsp;&gt;
             </button>
           )}
         </div>
-        <div className="last-page">
-          {currentPage !== Math.ceil(data.count / 100) && (
+        <div className="page-selection-button-container">
+          {currentPage < Math.ceil(data.count / 100) - 1 && (
             <button
+              className="page-selection-button last-page-button"
               onClick={() => {
                 setCurrentPage(Math.ceil(data.count / 100));
               }}
             >
-              Last
+              LAST PAGE &nbsp;&nbsp;&gt;&gt;
             </button>
           )}
         </div>
