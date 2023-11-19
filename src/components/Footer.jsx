@@ -5,7 +5,7 @@ const Footer = () => {
   return (
     <div className="footer-container">
       <div className="central-footer-container">
-        <div class="text">
+        <div className="text">
           <span>Made at </span>
           <Link to={"https://www.lereacteur.io/"}>Le Reacteur</Link>
           <span> by </span>
